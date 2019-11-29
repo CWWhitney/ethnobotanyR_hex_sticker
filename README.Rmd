@@ -1,0 +1,276 @@
+---
+output: github_document
+bibliography: packages.bib
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+<!-- Spelling -->
+<!-- The ABC √ option (upper right on the Rmarkdown console)-->
+
+<!-- Grammar -->
+<!-- devtools::install_github("ropenscilabs/gramr") -->
+<!-- run_grammar_checker("Hex_sticker.Rmd”) -->
+
+<!-- Print pdf version -->
+<!-- rmarkdown::render("README.Rmd", output_format = "pdf_document") -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+#packages in alphabetic order
+library(circlize)
+library(ethnobotanyR)
+library(ggplot2)
+#devtools::install_github("GuangchuangYu/hexSticker")
+library(hexSticker)
+library(knitr)
+library(RColorBrewer)
+library(tidyverse)
+
+
+#Automatically write R package citation entries to a .bib file
+knitr::write_bib(c(.packages(),
+                    'circlize',
+                    'ethnobotanyR',
+                    'hexSticker',
+                    'ggplot2',
+                    'knitr',
+                    'RColorBrewer',
+                    'tidyverse'), 'packages.bib')
+```
+
+# Hex sticker for ethnobotanyR
+Cory Whitney 
+[CWWhitney](https://github.com/CWWhitney)
+
+Here is a brief walk-through on how to use a version of the `sticker` function from `hexSticker` [@R-hexSticker] to generate the hex sticker for the `ethnobotanyR` package [@R-ethnobotanyR]. 
+
+<!-- Links: start -->
+|   Quick Links  |
+|:-------|
+| [**Generate a sticker**](https://github.com/CWWhitney/Hex_ _stickers#Generate a sticker) |
+| [**Bordeless sticker**](https://github.com/CWWhitney/Hex_ _stickers#Bordeless sticker) |
+| [**Small sticker**](https://github.com/CWWhitney/Hex_ _stickers##Small sticker) |
+
+<!-- Links: end -->
+
+Create a version of the `sticker` function from `hexSticker`. The new function is, quite originally, named `hex_sticker`. 
+
+```{r function}
+hex_sticker <-function (subplot, s_x = 0.8, s_y = 0.75, s_width = 0.4, s_height = 0.5, 
+    package, p_x = 1, p_y = 1.4, p_color = "#FFFFFF", p_family = "Aller_Rg", 
+    p_size = 8, h_size = 1.2, h_fill = "#1881C2", h_color = "#87B13F", 
+    spotlight = FALSE, l_x = 1, l_y = 0.5, l_width = 3, l_height = 3, 
+    l_alpha = 0.4, url = "", u_x = 1, u_y = 0.08, u_color = "black", 
+    u_family = "Aller_Rg", u_size = 1.5, u_angle = 30, white_around_sticker = FALSE, 
+    ..., filename = paste0(package, ".png"), asp = 1, dpi = 2000) 
+{
+    hex <- ggplot() + geom_hexagon(size = h_size, fill = h_fill, 
+        color = NA)
+    if (inherits(subplot, "character")) {
+        d <- data.frame(x = s_x, y = s_y, image = subplot)
+        sticker <- hex + geom_image(aes_(x = ~x, y = ~y, image = ~image), 
+            d, size = s_width, asp = asp)
+    }
+    else {
+        sticker <- hex + geom_subview(subview = subplot, x = s_x, 
+            y = s_y, width = s_width, height = s_height)
+    }
+    sticker <- sticker + geom_hexagon(size = h_size, fill = NA, 
+        color = h_color)
+    if (spotlight) 
+        sticker <- sticker + geom_subview(subview = spotlight(l_alpha), 
+            x = l_x, y = l_y, width = l_width, height = l_height)
+    sticker <- sticker + geom_pkgname(package, p_x, p_y, p_color, 
+        p_family, p_size, ...)
+    sticker <- sticker + geom_url(url, x = u_x, y = u_y, color = u_color, 
+        family = u_family, size = u_size, angle = u_angle)
+    if (white_around_sticker) 
+        sticker <- sticker + white_around_hex(size = h_size)
+    sticker <- sticker + theme_sticker(size = h_size)
+    save_sticker(filename, sticker, dpi = dpi)
+    invisible(sticker)
+}
+```
+
+Create a small data set for the plot in the middle of the sticker.
+
+```{r data}
+eth_data <- data.frame(variable = as.factor(1:10),
+                 value = sample(10, replace = TRUE))
+```
+
+Use the `coord_polar` function from `ggplot2` to make the central chord bar plot [@R-ggplot2]. 
+Different each time this is run. 
+
+```{r ggplot_polar}
+ethnobotanyR_sticker <- ggplot(eth_data, 
+  aes(variable, value, fill = variable)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_y_continuous(breaks = 0:nlevels(eth_data$variable)) +
+  theme_minimal() +
+  coord_polar()+ 
+  theme_void() + 
+  theme_transparent() + 
+  theme(legend.position="none")
+```
+
+```{r echo=FALSE, out.width='40%'}
+ethnobotanyR_sticker
+```
+
+
+# Generate a sticker
+
+Generate a png file of the hex sticker using the new `hex_sticker` function.
+
+```{r sticker}
+hex_sticker(ethnobotanyR_sticker, p_size=6, s_x=1, s_y=.75, s_width=1.5, s_height=1.2, h_fill = "lightgreen", h_color = "forestgreen", p_family = "serif", p_color = "forestgreen", package="ethnobotanyR", url = "cran.r-project.org/web/packages/ethnobotanyR", u_size = 1)
+```
+  
+## Bordeless sticker
+
+<img class="plain" src="ethnobotanyR.png"/>
+
+### Securely bordeless
+
+<img src="ethnobotanyR.png" style="background:none; border:none; box-shadow:none;">
+
+## Small sticker
+
+```{r echo=FALSE, out.width='20%'}
+knitr::include_graphics('ethnobotanyR.png')
+```
+
+# Chord diagrams for future stickers
+
+Create a simple chord plot in R [@R-base] and use colors from `RColorBrewer` to fill the connections [@R-RColorBrewer].
+
+```{r simple_chord_function, echo = FALSE, out.width='20%'}
+simple_chord_function <- function(u1, u2, v1, v2) {
+    # Check that the points are sufficiently different
+    if( abs(u1-v1) < 1e-6 && abs(u2-v2) < 1e-6 )
+        return( list(x=c(u1,v1), y=c(u2,v2)) )
+    # Check that we are in the circle
+    stopifnot( u1^2 + u2^2 - 1 <= 1e-6 )
+    stopifnot( v1^2 + v2^2 - 1 <= 1e-6 )
+    # Check it is not a diameter
+    if( abs( u1*v2 - u2*v1 ) < 1e-6 )
+        return( list(x=c(u1,v1), y=c(u2,v2)) )
+    # Equation of the line: x^2 + y^2 + ax + by + 1 = 0 (circles orthogonal to the unit circle)
+    a <- ( u2 * (v1^2+v2^2) - v2 * (u1^2+u2^2) + u2 - v2 ) / ( u1*v2 - u2*v1 )
+    b <- ( u1 * (v1^2+v2^2) - v1 * (u1^2+u2^2) + u1 - v1 ) / ( u2*v1 - u1*v2 ) # Swap 1's and 2's
+    # Center and radius of the circle
+    cx <- -a/2
+    cy <- -b/2
+    radius <- sqrt( (a^2+b^2)/4 - 1 )
+    # Which portion of the circle should we draw?
+    theta1 <- atan2( u2-cy, u1-cx )
+    theta2 <- atan2( v2-cy, v1-cx )
+    if( theta2 - theta1 > pi )
+        theta2 <- theta2 - 2 * pi
+    else if( theta2 - theta1 < - pi )
+        theta2 <- theta2 + 2 * pi
+    theta <- seq( theta1, theta2, length=100 )
+    x <- cx + radius * cos( theta )
+    y <- cy + radius * sin( theta )
+    list( x=x, y=y )
+}
+
+# Sample data
+n <- 12
+m <- 8
+segment_weight <- abs(rnorm(n))
+segment_weight <- segment_weight / sum(segment_weight)
+d <- matrix(abs(rnorm(n*n)),nr=n, nc=n)
+diag(d) <- 0 # No loops allowed
+# The weighted graph comes from two quantitative variables
+d[1:m,1:m] <- 0
+d[(m+1):n,(m+1):n] <- 0
+ribbon_weight <- t(d) / apply(d,2,sum) # The sum of each row is 1; use as ribbon_weight[from,to]
+ribbon_order <- t(apply(d,2,function(...)sample(1:n))) # Each row contains sample(1:n); use as ribbon_order[from,i]
+segment_colour <- rainbow(n)
+segment_colour <- brewer.pal(n,"Set3")
+transparent_segment_colour <- rgb(t(col2rgb(segment_colour)/255),alpha=.5)
+ribbon_colour <- matrix(rainbow(n*n), nr=n, nc=n) # Not used, actually...
+ribbon_colour[1:m,(m+1):n] <- transparent_segment_colour[1:m]
+ribbon_colour[(m+1):n,1:m] <- t(ribbon_colour[1:m,(m+1):n])
+
+# Plot
+gap <- .01
+x <- c( segment_weight[1:m], gap, segment_weight[(m+1):n], gap )
+x <- x / sum(x)
+x <- cumsum(x)
+segment_start <- c(0,x[1:m-1],x[(m+1):n])
+segment_end   <- c(x[1:m],x[(m+2):(n+1)])
+start1 <- start2 <- end1 <- end2 <- ifelse(is.na(ribbon_weight),NA,NA)
+x <- 0
+for (from in 1:n) {
+  x <- segment_start[from]
+  for (i in 1:n) {
+    to <- ribbon_order[from,i]
+    y <- x + ribbon_weight[from,to] * ( segment_end[from] - segment_start[from] )
+    if( from < to ) {
+      start1[from,to] <- x
+      start2[from,to] <- y
+    } else if( from > to ) {
+      end1[to,from] <- x
+      end2[to,from] <- y
+    } else {
+      # no loops allowed
+    }
+    x <- y
+  }
+}
+
+par(mar=c(1,1,2,1))
+plot(
+  0,0, 
+  xlim=c(-1,1),ylim=c(-1,1), type="n", axes=FALSE, 
+  main="", xlab="", ylab="")
+for(from in 1:n) {
+  for(to in 1:n) {
+    if(from<to) {
+      u <- start1[from,to]
+      v <- start2[from,to]
+      x <- end1  [from,to]
+      y <- end2  [from,to]
+      if(!is.na(u*v*x*y)) {
+            r1 <- simple_chord_function( cos(2*pi*v), sin(2*pi*v), cos(2*pi*x), sin(2*pi*x) )
+            r2 <- simple_chord_function( cos(2*pi*y), sin(2*pi*y), cos(2*pi*u), sin(2*pi*u) )
+            th1 <- 2*pi*seq(u,v,length=20)
+            th2 <- 2*pi*seq(x,y,length=20)
+            polygon(
+                c( cos(th1), r1$x, rev(cos(th2)), r2$x ),
+                c( sin(th1), r1$y, rev(sin(th2)), r2$y ),
+                col=transparent_segment_colour[from], border=NA
+            )
+      }
+    }
+  }
+}
+for(i in 1:n) {
+  theta <- 2*pi*seq(segment_start[i], segment_end[i], length=100)
+  r1 <- 1
+  r2 <- 1.05
+  polygon( 
+    c( r1*cos(theta), rev(r2*cos(theta)) ),
+    c( r1*sin(theta), rev(r2*sin(theta)) ),
+    col=segment_colour[i], border="black"
+  )
+}
+
+```
+
+The `ethnobotanyR` package also has options for producing chord diagrams with [@R-circlize] that may be part of future stickers [@R-ethnobotanyR]. Here is an example with the built-in data set `ethnobotanydata`.
+
+```{r ethno_chord}
+ethno_chord_plot_sticker_mid <- ethnoChord(ethnobotanydata, by = "sp_name")
+```
+
+      
+# References
