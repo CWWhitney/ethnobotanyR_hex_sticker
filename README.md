@@ -105,7 +105,7 @@ Generate a png file of the hex sticker using the new `hex_sticker`
 function.
 
 ``` r
-hex_sticker(ethnobotanyR_sticker, p_size=6, s_x=1, s_y=.75, s_width=1.5, s_height=1.2, h_fill = "lightgreen", h_color = "forestgreen", p_family = "serif", p_color = "forestgreen", package="ethnobotanyR", url = "cran.r-project.org/web/packages/ethnobotanyR", u_size = 1)
+hex_sticker(ethnobotanyR_sticker, p_size=6, s_x=1, s_y=.75, s_width=1.5, s_height=1.2, h_fill = "lightgreen", h_color = "forestgreen", p_family = "serif", p_color = "forestgreen", package="ethnobotanyR", url = "CRAN: ethnobotanyR", u_size = 2)
 ```
 
 ## Bordeless sticker
